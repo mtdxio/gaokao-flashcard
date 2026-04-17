@@ -339,14 +339,20 @@ var currentMode = '3500';
       document.getElementById('controls').classList.remove('show');
     }
 
+    function getFixedExample(w) {
+      if (w.example && w.example.indexOf('The meaning of ') === 0) { return null; }
+      return w.example;
+    }
+
     function flipCard() {
       isFlipped = !isFlipped;
       var w = displayWords[currentIndex];
       if (isFlipped) {
         var content = w.meaning || w.word;
-        if (w.example) {
-          content += '<div class="word-example">例句: ' + w.example;
-          if (w.example_zh) { content += '<br><span class="ex-trans">' + w.example_zh + '</span>'; }
+        var fixedExample = getFixedExample(w);
+        if (fixedExample) {
+          content += '<div class="word-example">例句: ' + fixedExample;
+          if (w.example_zh && w.example_zh.indexOf('的意思是') === -1) { content += '<br><span class="ex-trans">' + w.example_zh + '</span>'; }
           content += '</div>';
         }
         document.getElementById('wordText').innerHTML = content;
