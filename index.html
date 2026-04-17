@@ -116,6 +116,11 @@
           <span id="speedValue">0.75x</span>
         </div>
       </div>
+      <div class="options">
+        <select id="voiceSelect" onchange="changeVoice(this.value)" style="padding:6px;font-size:12px;border-radius:8px;">
+          <option value="">选择音色</option>
+        </select>
+      </div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
       <div class="progress-text" id="progressText">0 / 0</div>
     </main>
@@ -226,6 +231,7 @@ var currentMode = '3500';
     var accent = 'US';
     var audio = new Audio();
     var speechRate = parseFloat(localStorage.getItem('speechRate')) || 0.75;
+    var selectedVoice = localStorage.getItem('selectedVoice') || '';
 
     var voiceReady = false;
     var loadedVoices = [];
@@ -251,11 +257,20 @@ var currentMode = '3500';
         utterance.volume = 1;
         try {
           var voices = window.speechSynthesis.getVoices();
-          for (var i = 0; i < voices.length; i++) {
-            var v = voices[i];
-            if ((isUK && v.lang.startsWith('en-GB')) || (!isUK && v.lang.startsWith('en-US'))) {
-              utterance.voice = v;
-              break;
+          if (selectedVoice) {
+            for (var i = 0; i < voices.length; i++) {
+              if (voices[i].name === selectedVoice) {
+                utterance.voice = voices[i];
+                break;
+              }
+            }
+          } else {
+            for (var i = 0; i < voices.length; i++) {
+              var v = voices[i];
+              if ((isUK && v.lang.startsWith('en-GB')) || (!isUK && v.lang.startsWith('en-US'))) {
+                utterance.voice = v;
+                break;
+              }
             }
           }
         } catch(e) {}
@@ -279,9 +294,11 @@ var currentMode = '3500';
           if (v.length > 0 && !voiceReady) {
             loadedVoices = v;
           }
+          initVoiceSelect();
         } catch(e) {}
       };
     } catch(e) {}
+    try { initVoiceSelect(); } catch(e) {}
 
     function selectMode(mode) {
       currentMode = mode;
@@ -399,6 +416,27 @@ var currentMode = '3500';
     function toggleAccent() { accent = accent === 'US' ? 'UK' : 'US'; document.querySelector('.option-btn[onclick="toggleAccent()"]').textContent = accent === 'US' ? '🌐 美式' : '🌐 英式'; }
 
     function updateSpeed(val) { speechRate = parseFloat(val); document.getElementById('speedValue').textContent = val + 'x'; localStorage.setItem('speechRate', val); }
+
+    function changeVoice(val) { selectedVoice = val; localStorage.setItem('selectedVoice', val); }
+
+    function initVoiceSelect() {
+      try {
+        var voices = window.speechSynthesis.getVoices();
+        var select = document.getElementById('voiceSelect');
+        select.innerHTML = '<option value="">选择音色</option>';
+        var enVoices = voices.filter(function(v) { return v.lang.startsWith('en'); });
+        if (selectedVoice) {
+          var opts = '<option value="">选择音色</option>';
+          enVoices.forEach(function(v) { opts += '<option value="' + v.name + '">' + v.name + '</option>'; });
+          select.innerHTML = opts;
+          select.value = selectedVoice;
+        } else {
+          var opts = '<option value="">选择音色</option>';
+          enVoices.forEach(function(v) { opts += '<option value="' + v.name + '">' + v.name + '</option>'; });
+          select.innerHTML = opts;
+        }
+      } catch(e) {}
+    }
 
     function speakExampleBtn() { var w = displayWords[currentIndex]; if (w.example) speakWithBrowser(w.example, accent === 'UK'); }
 
