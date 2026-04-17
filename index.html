@@ -265,11 +265,23 @@ var currentMode = '3500';
               }
             }
           } else {
-            for (var i = 0; i < voices.length; i++) {
-              var v = voices[i];
-              if ((isUK && v.lang.startsWith('en-GB')) || (!isUK && v.lang.startsWith('en-US'))) {
-                utterance.voice = v;
-                break;
+            var voiceOrder = isUK ? ['Google UK English Female', 'Google UK English', 'Microsoft Libby Online', 'English United Kingdom'] : ['Google US English', 'Google US English Female', 'Microsoft Zira Desktop', 'English United States'];
+            for (var j = 0; j < voiceOrder.length; j++) {
+              for (var i = 0; i < voices.length; i++) {
+                if (voices[i].name.indexOf(voiceOrder[j]) !== -1) {
+                  utterance.voice = voices[i];
+                  break;
+                }
+              }
+              if (utterance.voice) break;
+            }
+            if (!utterance.voice) {
+              for (var i = 0; i < voices.length; i++) {
+                var v = voices[i];
+                if ((isUK && v.lang.startsWith('en-GB')) || (!isUK && v.lang.startsWith('en-US'))) {
+                  utterance.voice = v;
+                  break;
+                }
               }
             }
           }
