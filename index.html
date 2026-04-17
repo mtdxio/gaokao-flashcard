@@ -58,6 +58,7 @@
     .progress-bar { height: 5px; background: #ddd; border-radius: 3px; margin-top: 14px; }
     .progress-fill { height: 100%; background: #4f46e5; }
     .progress-text { text-align: center; font-size: 13px; color: #666; margin-top: 8px; }
+    .pos-type { color: #4f46e5; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -388,11 +389,21 @@ var currentMode = '3500';
       return w.example;
     }
 
+    function formatMeaning(meaning) {
+      if (!meaning) return '';
+      var m = meaning.trim();
+      m = m.replace(/\\r/g, '').replace(/\\n/g, ' ').replace(/\r/g, '').replace(/\n/g, ' ');
+      m = m.replace(/& /g, '&amp; ');
+      m = m.replace(/\s+/g, ' ');
+      m = m.replace(/([a-z]\)\.?)\s*([\u4e00-\u9fff])/g, '$1 <span class="pos-type">$2</span>');
+      return m;
+    }
+
     function flipCard() {
       isFlipped = !isFlipped;
       var w = displayWords[currentIndex];
       if (isFlipped) {
-        var content = w.meaning || w.word;
+        var content = formatMeaning(w.meaning || w.word);
         var fixedExample = getFixedExample(w);
         if (fixedExample) {
           content += '<div class="word-example">例句: ' + fixedExample;
