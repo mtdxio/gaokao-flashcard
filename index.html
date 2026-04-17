@@ -219,26 +219,56 @@ var currentMode = '3500';
     var accent = 'US';
     var audio = new Audio();
 
+    var voiceReady = false;
+    var loadedVoices = [];
+
     function speakWithBrowser(text, isUK) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        var utterance = new SpeechSynthesisUtterance(text);
-        var voices = window.speechSynthesis.getVoices();
-        var preferredVoice = voices.find(function(v) {
-          return isUK ? v.name.includes('Google UK English') || v.name.includes('Microsoft Libby') : v.name.includes('Google US English') || v.name.includes('Microsoft Zira');
-        }) || voices.find(function(v) {
-          return isUK ? v.lang.startsWith('en-GB') : v.lang.startsWith('en-US');
-        });
-        if (preferredVoice) utterance.voice = preferredVoice;
-        utterance.lang = isUK ? 'en-GB' : 'en-US';
-        utterance.rate = 0.85;
-        utterance.pitch = 1;
-        window.speechSynthesis.speak(utterance);
+      if (!voiceReady) {
+        if (window.speechSynthesis.getVoices().length > 0) {
+          loadedVoices = window.speechSynthesis.getVoices();
+          voiceReady = true;
+        } else {
+          return;
+        }
       }
+      window.speechSynthesis.cancel();
+      var utterance = new SpeechSynthesisUtterance(text);
+      var targetLang = isUK ? 'en-GB' : 'en-US';
+      var bestVoice = null;
+      for (var i = 0; i < loadedVoices.length; i++) {
+        var v = loadedVoices[i];
+        if (v.lang === targetLang || v.lang.startsWith(targetLang)) {
+          if (isUK && (v.name.includes('Google') || v.name.includes('Libby') || v.name.includes('Susan'))) { bestVoice = v; break; }
+          if (!isUK && (v.name.includes('Google') || v.name.includes('Zira') || v.name.includes('Jessa'))) { bestVoice = v; break; }
+        }
+      }
+      if (!bestVoice) {
+        for (var i = 0; i < loadedVoices.length; i++) {
+          if (loadedVoices[i].lang.startsWith(targetLang)) { bestVoice = loadedVoices[i]; break; }
+        }
+      }
+      if (bestVoice) utterance.voice = bestVoice;
+      utterance.lang = targetLang;
+      utterance.rate = 0.85;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      window.speechSynthesis.speak(utterance);
     }
 
     function speakWord() {
-      speakWithBrowser(displayWords[currentIndex].word, accent === 'UK');
+      var w = displayWords[currentIndex].word;
+      speakWithBrowser(w, accent === 'UK');
+    }
+
+    window.speechSynthesis.onvoiceschanged = function() {
+      if (window.speechSynthesis.getVoices().length > 0 && !voiceReady) {
+        loadedVoices = window.speechSynthesis.getVoices();
+        voiceReady = true;
+      }
+    };
+    if (window.speechSynthesis.getVoices().length > 0) {
+      loadedVoices = window.speechSynthesis.getVoices();
+      voiceReady = true;
     }
 
     function selectMode(mode) {
