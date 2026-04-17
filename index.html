@@ -51,8 +51,10 @@
     .btn { flex: 1; max-width: 130px; padding: 14px 20px; font-size: 16px; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; color: white; }
     .btn-no { background: #ef4444; }
     .btn-yes { background: #22c55e; }
-    .options { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+    .options { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px; align-items: center; }
     .option-btn { padding: 8px 12px; font-size: 12px; background: white; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; }
+    .speed-control { display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 4px 8px; background: #f5f5f5; border-radius: 8px; }
+    .speed-control input { width: 80px; }
     .progress-bar { height: 5px; background: #ddd; border-radius: 3px; margin-top: 14px; }
     .progress-fill { height: 100%; background: #4f46e5; }
     .progress-text { text-align: center; font-size: 13px; color: #666; margin-top: 8px; }
@@ -108,6 +110,11 @@
         <button class="option-btn" onclick="speakExampleBtn()">📖 例句</button>
         <button class="option-btn" onclick="toggleAccent()">🌐 美式</button>
         <button class="option-btn" onclick="shuffleCards()">🔀 随机</button>
+        <div class="speed-control">
+          <span>语速:</span>
+          <input type="range" id="speedSlider" min="0.5" max="1.2" step="0.1" oninput="updateSpeed(this.value)">
+          <span id="speedValue">0.75x</span>
+        </div>
       </div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
       <div class="progress-text" id="progressText">0 / 0</div>
@@ -218,6 +225,7 @@ var currentMode = '3500';
     var unknownDelay = 8;
     var accent = 'US';
     var audio = new Audio();
+    var speechRate = parseFloat(localStorage.getItem('speechRate')) || 0.75;
 
     var voiceReady = false;
     var loadedVoices = [];
@@ -238,7 +246,7 @@ var currentMode = '3500';
       try {
         var utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = isUK ? 'en-GB' : 'en-US';
-        utterance.rate = 0.75;
+        utterance.rate = speechRate;
         utterance.pitch = 1;
         utterance.volume = 1;
         try {
@@ -389,6 +397,8 @@ var currentMode = '3500';
     function shuffleCards() { displayWords.sort(() => Math.random() - 0.5); currentIndex = 0; unknownQueue = []; showWord(); }
 
     function toggleAccent() { accent = accent === 'US' ? 'UK' : 'US'; document.querySelector('.option-btn[onclick="toggleAccent()"]').textContent = accent === 'US' ? '🌐 美式' : '🌐 英式'; }
+
+    function updateSpeed(val) { speechRate = parseFloat(val); document.getElementById('speedValue').textContent = val + 'x'; localStorage.setItem('speechRate', val); }
 
     function speakExampleBtn() { var w = displayWords[currentIndex]; if (w.example) speakWithBrowser(w.example, accent === 'UK'); }
 
