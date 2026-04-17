@@ -278,9 +278,12 @@ var currentMode = '3500';
       document.getElementById('modeHigh').className = 'mode-btn' + (mode === 'high' ? ' active' : '');
       
       if (mode === 'high') {
-        document.getElementById('catBar').classList.add('show');
-        renderCatBar();
-        selectCategory(categories[0].name);
+        document.getElementById('catBar').classList.remove('show');
+        displayWords = allWords.filter(function(w) { return w.source === 'high'; }).slice();
+        currentIndex = 0;
+        unknownQueue = [];
+        document.getElementById('totalWords').textContent = displayWords.length;
+        showWord();
       } else {
         document.getElementById('catBar').classList.remove('show');
         displayWords = allWords.filter(function(w) { return w.source === '3500'; }).slice();
