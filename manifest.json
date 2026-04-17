@@ -1,0 +1,16 @@
+{
+  "name": "高考英语词汇 - 闪卡背诵",
+  "short_name": "高考英语",
+  "description": "高考英语3500词+高频词闪卡背诵应用",
+  "start_url": "/vocabulary.html",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
