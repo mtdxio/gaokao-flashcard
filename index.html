@@ -223,20 +223,23 @@ var currentMode = '3500';
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         var utterance = new SpeechSynthesisUtterance(text);
+        var voices = window.speechSynthesis.getVoices();
+        var preferredVoice = voices.find(function(v) {
+          return isUK ? v.name.includes('Google UK English') || v.name.includes('Microsoft Libby') : v.name.includes('Google US English') || v.name.includes('Microsoft Zira');
+        }) || voices.find(function(v) {
+          return isUK ? v.lang.startsWith('en-GB') : v.lang.startsWith('en-US');
+        });
+        if (preferredVoice) utterance.voice = preferredVoice;
         utterance.lang = isUK ? 'en-GB' : 'en-US';
-        utterance.rate = 0.8;
+        utterance.rate = 0.85;
+        utterance.pitch = 1;
         window.speechSynthesis.speak(utterance);
       }
     }
 
-    function speakWithGoogle(text, isUK) {
-      var lang = isUK ? 'en-GB' : 'en-US';
-      var url = 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(text) + '&tl=' + lang + '&client=tw-ob';
-      audio.src = url;
-      audio.play().catch(function() {});
+    function speakWord() {
+      speakWithBrowser(displayWords[currentIndex].word, accent === 'UK');
     }
-
-    function speakWord() { speakWithBrowser(displayWords[currentIndex].word, accent === 'UK'); }
 
     function selectMode(mode) {
       currentMode = mode;
