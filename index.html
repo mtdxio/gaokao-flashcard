@@ -118,7 +118,13 @@
       </div>
       <div class="options">
         <select id="voiceSelect" onchange="changeVoice(this.value)" style="padding:6px;font-size:12px;border-radius:8px;">
-          <option value="">选择音色</option>
+          <option value="">默认音色</option>
+          <option value="__auto__">智能匹配(推荐)</option>
+          <option value="Google US English">Google 美音</option>
+          <option value="Google UK English">Google 英音</option>
+          <option value="Microsoft Zira Desktop">Microsoft 美音</option>
+          <option value="Microsoft Libby Online">Microsoft 英音</option>
+          <option value="__cloud__">云端语音(高品质)</option>
         </select>
       </div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
@@ -250,6 +256,7 @@ var currentMode = '3500';
         }
       }
       try {
+        if (selectedVoice === '__cloud__') { var url = 'https://translate.google.com/translate_tts?ie=UTF-8&tl=' + (isUK ? 'en-GB' : 'en-US') + '&q=' + encodeURIComponent(text) + '&client=tw-ob&ttsspeed=' + Math.round((1-speechRate)*100); audio.src = url; audio.play().catch(function() {}); return; }
         var utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = isUK ? 'en-GB' : 'en-US';
         utterance.rate = speechRate;
@@ -257,7 +264,7 @@ var currentMode = '3500';
         utterance.volume = 1;
         try {
           var voices = window.speechSynthesis.getVoices();
-          if (selectedVoice) {
+          if (selectedVoice && selectedVoice !== '__auto__') {
             for (var i = 0; i < voices.length; i++) {
               if (voices[i].name === selectedVoice) {
                 utterance.voice = voices[i];
