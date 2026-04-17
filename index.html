@@ -219,6 +219,25 @@ var currentMode = '3500';
     var accent = 'US';
     var audio = new Audio();
 
+    function speakWithBrowser(text, isUK) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        var utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = isUK ? 'en-GB' : 'en-US';
+        utterance.rate = 0.8;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function speakWithGoogle(text, isUK) {
+      var lang = isUK ? 'en-GB' : 'en-US';
+      var url = 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(text) + '&tl=' + lang + '&client=tw-ob';
+      audio.src = url;
+      audio.play().catch(function() {});
+    }
+
+    function speakWord() { speakWithBrowser(displayWords[currentIndex].word, accent === 'UK'); }
+
     function selectMode(mode) {
       currentMode = mode;
       currentCat = null;
@@ -325,9 +344,7 @@ var currentMode = '3500';
 
     function toggleAccent() { accent = accent === 'US' ? 'UK' : 'US'; document.querySelector('.option-btn[onclick="toggleAccent()"]').textContent = accent === 'US' ? '🌐 美式' : '🌐 英式'; }
 
-    function speakWithGoogle(text, isUK) { var lang = isUK ? 'en-GB' : 'en-US'; var url = 'https://translate.google.com/translate_tts?ie=UTF-8&q=' + encodeURIComponent(text) + '&tl=' + lang + '&client=tw-ob'; audio.src = url; audio.play().catch(function() {}); }
-    function speakWord() { speakWithGoogle(displayWords[currentIndex].word, accent === 'UK'); }
-    function speakExampleBtn() { var w = displayWords[currentIndex]; if (w.example) speakWithGoogle(w.example, accent === 'UK'); }
+    function speakExampleBtn() { var w = displayWords[currentIndex]; if (w.example) speakWithBrowser(w.example, accent === 'UK'); }
 
     function saveProgress() {
       var key = currentMode === '3500' ? 'vocab-progress' : 'hf-progress-' + currentCat;
