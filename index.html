@@ -328,7 +328,7 @@ var currentMode = '3500';
       
       if (mode === 'high') {
         document.getElementById('catBar').classList.remove('show');
-        displayWords = allWords.filter(function(w) { return w.source === 'high'; }).slice();
+        displayWords = allWords.filter(function(w) { return w.source === '高频1975'; }).slice();
         currentIndex = 0;
         unknownQueue = [];
         document.getElementById('totalWords').textContent = displayWords.length;
