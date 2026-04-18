@@ -321,6 +321,7 @@ var currentMode = '3500';
     try { initVoiceSelect(); } catch(e) {}
 
     function selectMode(mode) {
+      console.log('selectMode called with:', mode);
       currentMode = mode;
       currentCat = null;
       document.getElementById('mode3500').className = 'mode-btn' + (mode === '3500' ? ' active' : '');
@@ -328,14 +329,18 @@ var currentMode = '3500';
       
       if (mode === 'high') {
         document.getElementById('catBar').classList.remove('show');
-        displayWords = allWords.filter(function(w) { return w.source === '高频1975'; }).slice();
+        var filtered = allWords.filter(function(w) { return w.source === '高频1975'; });
+        console.log('high filtered count:', filtered.length);
+        displayWords = filtered.slice();
         currentIndex = 0;
         unknownQueue = [];
         document.getElementById('totalWords').textContent = displayWords.length;
         showWord();
       } else {
         document.getElementById('catBar').classList.remove('show');
-        displayWords = allWords.filter(function(w) { return w.source === '常用3565'; }).slice();
+        var filtered = allWords.filter(function(w) { return w.source === '常用3565'; });
+        console.log('常用3565 filtered count:', filtered.length);
+        displayWords = filtered.slice();
         currentIndex = 0;
         unknownQueue = [];
         document.getElementById('totalWords').textContent = displayWords.length;
