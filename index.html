@@ -376,7 +376,7 @@ var currentMode = '3500';
       document.getElementById('wordSource').textContent = w.source === '常用3565' ? '常用3565' : '高频1975';
       document.getElementById('wordSource').style.background = w.source === '常用3565' ? '#10b981' : '#f59e0b';
       document.getElementById('wordText').textContent = w.word;
-      document.getElementById('wordPhonetic').textContent = (w.phonetic||'') + ' ' + (w.pos||'');
+      document.getElementById('wordPhonetic').textContent = formatPhonetic(w.phonetic, w.pos);
       document.getElementById('tapHint').textContent = '点击显示释义';
       document.getElementById('progressText').textContent = (currentIndex + 1) + ' / ' + displayWords.length;
       document.getElementById('progressFill').style.width = ((currentIndex + 1) / displayWords.length * 100) + '%';
