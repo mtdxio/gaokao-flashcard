@@ -399,6 +399,17 @@ var currentMode = '3500';
       return m;
     }
 
+    function formatPhonetic(phonetic, pos) {
+      var p = (phonetic||'').replace(/\\r/g, '').replace(/\\n/g, ' ').replace(/\r/g, '').replace(/\n/g, ' ').trim();
+      var parts = [];
+      if (p) parts.push(p);
+      if (pos) {
+        var posClean = pos.replace(/\\r/g, '').replace(/\\n/g, ' ').replace(/\r/g, '').replace(/\n/g, ' ').trim();
+        if (posClean) parts.push(posClean);
+      }
+      return parts.join(' ');
+    }
+
     function flipCard() {
       isFlipped = !isFlipped;
       var w = displayWords[currentIndex];
@@ -411,12 +422,12 @@ var currentMode = '3500';
           content += '</div>';
         }
         document.getElementById('wordText').innerHTML = content;
-        document.getElementById('wordPhonetic').textContent = (w.phonetic||'') + ' ' + (w.pos||'');
+        document.getElementById('wordPhonetic').textContent = formatPhonetic(w.phonetic, w.pos);
         document.getElementById('tapHint').textContent = '';
         document.getElementById('controls').classList.add('show');
       } else {
         document.getElementById('wordText').textContent = w.word;
-        document.getElementById('wordPhonetic').textContent = (w.phonetic||'') + ' ' + (w.pos||'');
+        document.getElementById('wordPhonetic').textContent = formatPhonetic(w.phonetic, w.pos);
         document.getElementById('tapHint').textContent = '点击显示释义';
         document.getElementById('controls').classList.remove('show');
       }
