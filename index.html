@@ -222,13 +222,56 @@ if (savedUser) {
 function saveProgress() {
   var today = new Date().toDateString();
   if (lastDate !== today) { streak++; lastDate = today; }
-  var key = currentMode === '3500' ? 'vocab-progress' : 'hf-progress-' + currentCat;
-  localStorage.setItem(key, JSON.stringify({learned: Array.from(learnedWords), streak: streak, lastDate: lastDate, unknownQueue: unknownQueue}));
+  var key = currentMode === '3500' ? 'vocab-progress' : 'hf-progress';
+  var data = {
+    learned: Array.from(learnedWords), 
+    streak: streak, 
+    lastDate: lastDate, 
+    unknownQueue: unknownQueue,
+    currentIndex: currentIndex,
+    currentMode: currentMode
+  };
+  localStorage.setItem(key, JSON.stringify(data));
+  localStorage.setItem('lastMode', currentMode);
   document.getElementById('learnedCount').textContent = learnedWords.size;
   document.getElementById('streak').textContent = streak;
 }
 
-var currentMode = '3500';
+function loadProgress() {
+  var savedMode = localStorage.getItem('lastMode') || '3500';
+  var key = savedMode === '3500' ? 'vocab-progress' : 'hf-progress';
+  try { 
+    var saved = localStorage.getItem(key); 
+    if(saved) { 
+      var d = JSON.parse(saved); 
+      learnedWords = new Set(d.learned||[]); 
+      unknownQueue = d.unknownQueue||[]; 
+      streak = d.streak || 0;
+      lastDate = d.lastDate || '';
+      if (d.currentMode) { currentMode = d.currentMode; }
+    } 
+  } catch(e) {}
+  document.getElementById('learnedCount').textContent = learnedWords.size;
+  document.getElementById('streak').textContent = streak;
+  if (currentMode) {
+    document.getElementById('mode3500').className = 'mode-btn' + (currentMode === '3500' ? ' active' : '');
+    document.getElementById('modeHigh').className = 'mode-btn' + (currentMode === 'high' ? ' active' : '');
+  }
+}
+
+function loadInitialProgress() {
+  var lastMode = localStorage.getItem('lastMode') || '3500';
+  var key = lastMode === '3500' ? 'vocab-progress' : 'hf-progress';
+  try { 
+    var saved = localStorage.getItem(key); 
+    if(saved) { 
+      var d = JSON.parse(saved); 
+      if (d.currentMode === 'high') { currentMode = 'high'; }
+      else { currentMode = '3500'; }
+    } 
+  } catch(e) {}
+
+    var currentMode = '3500';
     var currentCat = null;
     var currentIndex = 0;
     var isFlipped = false;
@@ -239,6 +282,8 @@ var currentMode = '3500';
     var audio = new Audio();
     var speechRate = parseFloat(localStorage.getItem('speechRate')) || 0.75;
     var selectedVoice = localStorage.getItem('selectedVoice') || '';
+    var streak = 0;
+    var lastDate = '';
 
     var voiceReady = false;
     var loadedVoices = [];
@@ -497,9 +542,12 @@ var currentMode = '3500';
       try { var saved = localStorage.getItem(key); if(saved) { var d = JSON.parse(saved); learnedWords = new Set(d.learned||[]); unknownQueue = d.unknownQueue||[]; } } catch(e) {}
     }
 
-    selectMode('3500');
+    loadInitialProgress();
+    if (currentMode === 'high') { selectMode('high'); }
+    else { selectMode('3500'); }
     loadProgress();
     document.getElementById('learnedCount').textContent = learnedWords.size;
+    document.getElementById('streak').textContent = streak;
   </script>
 </body>
 </html>
