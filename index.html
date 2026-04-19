@@ -137,6 +137,15 @@ async function submitLogin() {
   if (!username || !password) { alert('请填写用户名和密码'); return; }
   if (isRegisterMode && !nickname) { alert('请填写昵称'); return; }
   
+  if (!USE_CLOUD || !API_URL) {
+    currentUser = { username: username, nickname: nickname || username };
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('userInfo').classList.add('show');
+    document.getElementById('userName').textContent = currentUser.nickname || currentUser.username;
+    return;
+  }
+  
   const endpoint = isRegisterMode ? '/api/register' : '/api/login';
   try {
     const res = await fetch(API_URL + endpoint, {
@@ -211,6 +220,8 @@ function saveProgress() {
   saveCloudProgress();
 }
 
+var USE_CLOUD = false;
+var API_URL = '';
 var currentMode = '3500';
     var currentCat = null;
     var currentIndex = 0;
