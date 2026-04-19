@@ -151,9 +151,11 @@ function toggleMode() {
 }
 
 async function submitLogin() {
+  console.log('submitLogin called, isRegisterMode:', isRegisterMode, 'USE_CLOUD:', USE_CLOUD);
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
   const nickname = document.getElementById('nickname').value.trim();
+  console.log('username:', username);
   
   if (!username || !password) { alert('请填写用户名和密码'); return; }
   
@@ -174,6 +176,7 @@ async function submitLogin() {
   }
   
   localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  console.log('Login success, currentUser:', currentUser);
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('userInfo').classList.add('show');
   document.getElementById('userName').textContent = currentUser.nickname || currentUser.username;
