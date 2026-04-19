@@ -1,0 +1,7 @@
+name = "gaokao-flashcard"
+main = "worker.js"
+compatibility_date = "2023-12-01"
+
+[[kv_namespaces]]
+binding = "USERS"
+id = "d5a5d44938404397ba540ef66be581ba"
