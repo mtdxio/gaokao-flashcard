@@ -117,8 +117,9 @@
           <span id="speedValue">0.75x</span>
           <select id="ttsSelect" onchange="changeTTS(this.value)" style="font-size:11px;margin-left:8px;">
             <option value="browser">系统发音</option>
-            <option value="google">Google云发音(推荐)</option>
+            <option value="google">Google云发音</option>
           </select>
+        </div>
         </div>
       </div>
       <div class="options">
@@ -256,6 +257,25 @@ var currentMode = '3500';
         var url = 'https://translate.google.com/translate_tts?ie=UTF-8&tl=en-US&q=' + encodeURIComponent(text) + '&client=tw-ob';
         audio.src = url;
         audio.play().catch(function() {});
+        return;
+      }
+      if (ttsMode === 'edge') {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://speech.platform.bing.com/td/sapi/tts?appid=FlashCard', true);
+        xhr.setRequestHeader('Content-Type', 'application/ssml+xml');
+        xhr.setRequestHeader('X-Timestamp', new Date().toISOString());
+        xhr.onload = function() {
+          if (xhr.status === 200 && xhr.responseText) {
+            try {
+              var data = JSON.parse(xhr.responseText);
+              if (data.audio) {
+                audio.src = 'data:audio/mp3;base64,' + data.audio;
+                audio.play().catch(function() {});
+              }
+            } catch(e) {}
+          }
+        };
+        xhr.send('<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US"><voice name="en-US-JennyNeural">' + text + '</voice></speak>');
         return;
       }
       
