@@ -111,10 +111,14 @@
         <button class="option-btn" onclick="speakExampleBtn()">📖 例句</button>
         
         <button class="option-btn" onclick="shuffleCards()">🔀 随机</button>
-        <div class="speed-control">
+        <div class="speed-control" style="font-size:11px;">
           <span>语速:</span>
           <input type="range" id="speedSlider" min="0.5" max="1.2" step="0.1" oninput="updateSpeed(this.value)">
           <span id="speedValue">0.75x</span>
+          <select id="ttsSelect" onchange="changeTTS(this.value)" style="font-size:11px;margin-left:8px;">
+            <option value="browser">系统发音</option>
+            <option value="google">Google云发音(推荐)</option>
+          </select>
         </div>
       </div>
       <div class="options">
@@ -239,11 +243,22 @@ var currentMode = '3500';
     var audio = new Audio();
     var speechRate = parseFloat(localStorage.getItem('speechRate')) || 0.75;
     var selectedVoice = localStorage.getItem('selectedVoice') || '';
+    var ttsMode = localStorage.getItem('ttsMode') || 'browser';
 
     var voiceReady = false;
     var loadedVoices = [];
 
+    function changeTTS(mode) { ttsMode = mode; localStorage.setItem('ttsMode', mode); }
+    function updateSpeed(val) { speechRate = parseFloat(val); document.getElementById('speedValue').textContent = val + 'x'; localStorage.setItem('speechRate', val); }
+
     function speakWithBrowser(text, isUK) {
+      if (ttsMode === 'google') {
+        var url = 'https://translate.google.com/translate_tts?ie=UTF-8&tl=en-US&q=' + encodeURIComponent(text) + '&client=tw-ob';
+        audio.src = url;
+        audio.play().catch(function() {});
+        return;
+      }
+      
       try {
         window.speechSynthesis.cancel();
       } catch(e) {}
